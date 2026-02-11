@@ -16,7 +16,6 @@ public class BaseTest {
     public void setUp() {
         WebDriverManager.chromedriver().setup();
 
-        // Now 'driver' is recognized!
         driver = new ChromeDriver();
 
         driver.manage().window().maximize();
