@@ -13,23 +13,6 @@ import pages.*;
 
 public class UserWorkFlowTests extends BaseTest {
 
-    @BeforeClass
-    @Override
-    public void setUp() {
-        super.setUp();
-    }
-
-    @AfterClass
-    @Override
-    public void tearDown() {
-        super.tearDown();
-    }
-
-    @BeforeMethod
-    public void refreshPage() {
-        driver.get("https://automationexercise.com");
-    }
-
     @Test(priority = 1)
     public void testExistingEmailRegistration() {
         WebElement loginLink = driver.findElement(By.xpath("//a[contains(text(),'Signup / Login')]"));
