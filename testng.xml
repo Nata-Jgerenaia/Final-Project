@@ -3,10 +3,9 @@
 <suite name="Final Project Suite">
     <test thread-count="5" name="API and UI Tests">
         <classes>
+            <class name="API_tests.ProductApiTests"/>
+            <class name="UI_tests.UserWorkFlowTests"/>
             <class name="API_tests.APItest"/>
-
         </classes>
     </test>
 </suite>
-
-
