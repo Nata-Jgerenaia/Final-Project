@@ -21,6 +21,7 @@ public class APItest {
         Response response = get("/productsList");
         Assert.assertEquals(response.getStatusCode(), 200);
         Assert.assertTrue(response.getBody().asString().contains("products"), "Body should contain products");
+
     }
 
     @Test
@@ -29,7 +30,6 @@ public class APItest {
         JsonPath json = response.jsonPath();
 
         Assert.assertEquals(json.get("responseCode"), (Integer) 405);
-        // FIXED: Added a dot at the end of the string
         Assert.assertEquals(json.get("message"), "This request method is not supported.");
     }
 
