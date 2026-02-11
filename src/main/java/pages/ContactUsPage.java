@@ -1,9 +1,6 @@
 package pages;
 
-import org.openqa.selenium.By;
-import org.openqa.selenium.JavascriptExecutor;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
+import org.openqa.selenium.*;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.time.Duration;
@@ -26,21 +23,36 @@ public class ContactUsPage {
     private By successMessage = By.cssSelector(".status.alert.alert-success");
 
     public void fillContactForm(String name, String email, String subject, String message) {
-        WebElement link = wait.until(ExpectedConditions.presenceOfElementLocated(contactUsLink));
+        // Navigate to Contact Us
+        WebElement link = wait.until(ExpectedConditions.elementToBeClickable(contactUsLink));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
 
+        // Fill fields
         wait.until(ExpectedConditions.visibilityOfElementLocated(nameField)).sendKeys(name);
         driver.findElement(emailField).sendKeys(email);
         driver.findElement(subjectField).sendKeys(subject);
         driver.findElement(messageField).sendKeys(message);
 
+        // Scroll to the button to make sure it's in view before clicking
         WebElement submitBtn = driver.findElement(submitButton);
-        ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", submitBtn);
+
+        // Click the submit button
+        submitBtn.click();
     }
 
     public void handleAlert() {
-        wait.until(ExpectedConditions.alertIsPresent());
-        driver.switchTo().alert().accept();
+        try {
+            // Wait for the native JS alert
+            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            alert.accept();
+        } catch (TimeoutException e) {
+            // If the standard click failed to trigger it, try JS click as backup
+            WebElement submitBtn = driver.findElement(submitButton);
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", submitBtn);
+            Alert alert = wait.until(ExpectedConditions.alertIsPresent());
+            alert.accept();
+        }
     }
 
     public String getSuccessText() {

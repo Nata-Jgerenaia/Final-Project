@@ -3,27 +3,29 @@ package base;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.AfterMethod;
-import org.testng.annotations.BeforeMethod;
+import org.testng.annotations.AfterClass;
+import org.testng.annotations.BeforeClass;
 import java.time.Duration;
 
 public class BaseTest {
 
-    // ADD THIS LINE HERE:
+    // protected allows UserWorkFlowTests to use this driver
     protected WebDriver driver;
 
-    @BeforeMethod
+    @BeforeClass // Changed from Method to Class
     public void setUp() {
         WebDriverManager.chromedriver().setup();
-
         driver = new ChromeDriver();
 
         driver.manage().window().maximize();
+        // Keep the implicit wait - it's important for stability!
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+
+        // Initial navigation
         driver.get("https://automationexercise.com");
     }
 
-    @AfterMethod
+    @AfterClass // Changed from Method to Class
     public void tearDown() {
         if (driver != null) {
             driver.quit();
