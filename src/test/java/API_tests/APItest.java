@@ -47,7 +47,6 @@ public class APItest {
         JsonPath json = response.jsonPath();
 
         Assert.assertEquals(json.get("responseCode"), (Integer) 405);
-        // FIXED: Added a dot at the end of the string
         Assert.assertEquals(json.get("message"), "This request method is not supported.");
     }
 }

@@ -3,32 +3,37 @@ package base;
 import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
-import org.testng.annotations.AfterClass;
-import org.testng.annotations.BeforeClass;
+import org.testng.annotations.AfterMethod;
+import org.testng.annotations.BeforeMethod;
 import java.time.Duration;
 
 public class BaseTest {
+    // ThreadLocal ensures each parallel browser has its own driver
+    private static ThreadLocal<WebDriver> driverThread = new ThreadLocal<>();
 
-    // protected allows UserWorkFlowTests to use this driver
-    protected WebDriver driver;
+    // Static email so all tests use the SAME user created in Step 1
+    protected static String sharedEmail;
+    protected static String sharedPassword = "Pass123!";
 
-    @BeforeClass // Changed from Method to Class
+    @BeforeMethod
     public void setUp() {
         WebDriverManager.chromedriver().setup();
-        driver = new ChromeDriver();
-
+        WebDriver driver = new ChromeDriver();
         driver.manage().window().maximize();
-        // Keep the implicit wait - it's important for stability!
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
-
-        // Initial navigation
-        driver.get("https://automationexercise.com");
+        driverThread.set(driver);
+        getDriver().get("https://automationexercise.com");
     }
 
-    @AfterClass // Changed from Method to Class
+    public WebDriver getDriver() {
+        return driverThread.get();
+    }
+
+    @AfterMethod
     public void tearDown() {
-        if (driver != null) {
-            driver.quit();
+        if (getDriver() != null) {
+            getDriver().quit();
+            driverThread.remove();
         }
     }
 }

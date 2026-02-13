@@ -5,7 +5,6 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
@@ -13,69 +12,69 @@ import java.time.Duration;
 
 public class RegistrationLoginTests extends BaseTest {
 
+    private void jsClick(WebElement element) {
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", element);
+    }
+
+    // STEP 1: REGISTRATION (This runs alone first)
     @Test
-    public void testFullUserLifecycle() {
-        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
-        JavascriptExecutor js = (JavascriptExecutor) driver;
-        String email = "nata." + System.currentTimeMillis() + "@mail.com";
-        String password = "Pass123!";
+    public void testUserRegistration() throws InterruptedException {
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(20));
+        sharedEmail = "nata." + System.currentTimeMillis() + "@mail.com";
 
-        // --- STEP 1: REGISTER ---
-        driver.get("https://automationexercise.com/login");
-        driver.findElement(By.xpath("//input[@data-qa='signup-name']")).sendKeys("Nata");
-        driver.findElement(By.xpath("//input[@data-qa='signup-email']")).sendKeys(email);
-        driver.findElement(By.xpath("//button[@data-qa='signup-button']")).click();
+        getDriver().get("https://automationexercise.com/login");
+        getDriver().findElement(By.xpath("//input[@data-qa='signup-name']")).sendKeys("Nata");
+        getDriver().findElement(By.xpath("//input[@data-qa='signup-email']")).sendKeys(sharedEmail);
+        jsClick(getDriver().findElement(By.xpath("//button[@data-qa='signup-button']")));
 
-        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password")));
-        driver.findElement(By.id("id_gender2")).click();
-        driver.findElement(By.id("password")).sendKeys(password);
+        // Fill data...
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("password"))).sendKeys(sharedPassword);
+        getDriver().findElement(By.id("first_name")).sendKeys("Nata");
+        getDriver().findElement(By.id("last_name")).sendKeys("Test");
+        getDriver().findElement(By.id("address1")).sendKeys("123 Automation St");
+        getDriver().findElement(By.id("state")).sendKeys("Georgia");
+        getDriver().findElement(By.id("city")).sendKeys("Tbilisi");
+        getDriver().findElement(By.id("zipcode")).sendKeys("0101");
+        getDriver().findElement(By.id("mobile_number")).sendKeys("555123456");
 
-        new Select(driver.findElement(By.id("days"))).selectByVisibleText("10");
-        new Select(driver.findElement(By.id("months"))).selectByVisibleText("May");
-        new Select(driver.findElement(By.id("years"))).selectByVisibleText("1995");
-
-        driver.findElement(By.id("first_name")).sendKeys("Nata");
-        driver.findElement(By.id("last_name")).sendKeys("Test");
-        driver.findElement(By.id("address1")).sendKeys("123 Automation St");
-        new Select(driver.findElement(By.id("country"))).selectByVisibleText("United States");
-        driver.findElement(By.id("state")).sendKeys("Georgia");
-        driver.findElement(By.id("city")).sendKeys("Tbilisi");
-        driver.findElement(By.id("zipcode")).sendKeys("0101");
-        driver.findElement(By.id("mobile_number")).sendKeys("555123456");
-
-        WebElement createBtn = driver.findElement(By.xpath("//button[@data-qa='create-account']"));
-        js.executeScript("arguments[0].click();", createBtn);
-
-        // Verify Registration
+        jsClick(getDriver().findElement(By.xpath("//button[@data-qa='create-account']")));
         wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//b[text()='Account Created!']")));
 
-        // --- STEP 2: LOGOUT (Via Home Page to avoid ads) ---
-        driver.get("https://automationexercise.com/");
-        WebElement logoutBtn = wait.until(ExpectedConditions.elementToBeClickable(By.linkText("Logout")));
-        js.executeScript("arguments[0].click();", logoutBtn);
-        Assert.assertTrue(driver.findElement(By.linkText("Signup / Login")).isDisplayed(), "Logout failed!");
+        System.out.println("Registration finished. Triggering parallel logins now...");
+        Thread.sleep(2000); // Small pause for DB sync
+    }
 
-        // --- STEP 3: INCORRECT LOGIN ---
-        driver.findElement(By.linkText("Signup / Login")).click();
-        driver.findElement(By.xpath("//input[@data-qa='login-email']")).sendKeys(email);
-        driver.findElement(By.xpath("//input[@data-qa='login-password']")).sendKeys("WrongPassword123");
-        driver.findElement(By.xpath("//button[@data-qa='login-button']")).click();
+    // BROWSER 1: Login & Logout
+    @Test(dependsOnMethods = "testUserRegistration")
+    public void testLoginAndLogoutFlow() {
+        System.out.println("LOG: Browser 1 (Login/Logout) starting on Thread: " + Thread.currentThread().getId());
+        performLogin(sharedEmail, sharedPassword);
 
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(20));
+        wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Logged in as')]")));
+
+        jsClick(getDriver().findElement(By.linkText("Logout")));
+        Assert.assertTrue(getDriver().findElement(By.linkText("Signup / Login")).isDisplayed());
+    }
+
+    // BROWSER 2: Incorrect Login
+    @Test(dependsOnMethods = "testUserRegistration")
+    public void testLoginIncorrect() {
+        System.out.println("LOG: Browser 2 (Incorrect Login) starting on Thread: " + Thread.currentThread().getId());
+        performLogin(sharedEmail, "WrongPassword123!");
+
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(20));
         WebElement errorMsg = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//p[@style='color: red;']")));
-        Assert.assertTrue(errorMsg.getText().contains("incorrect"), "Error message not displayed for wrong login!");
+        Assert.assertTrue(errorMsg.getText().contains("incorrect"));
+    }
 
-        // --- STEP 4: CORRECT LOGIN ---
-        // Clear fields and try again
-        driver.findElement(By.xpath("//input[@data-qa='login-email']")).clear();
-        driver.findElement(By.xpath("//input[@data-qa='login-email']")).sendKeys(email);
-        driver.findElement(By.xpath("//input[@data-qa='login-password']")).clear();
-        driver.findElement(By.xpath("//input[@data-qa='login-password']")).sendKeys(password);
-        driver.findElement(By.xpath("//button[@data-qa='login-button']")).click();
-
-        // Final Verification
-        WebElement loggedInAs = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Logged in as')]")));
-        Assert.assertTrue(loggedInAs.isDisplayed(), "Final login failed!");
-
-        System.out.println("Success: Registered, Logged Out, Failed Login, and Correct Login completed in one session!");
+    private void performLogin(String email, String password) {
+        getDriver().get("https://automationexercise.com/login");
+        ((JavascriptExecutor) getDriver()).executeScript(
+                "const ads = document.getElementsByClassName('adsbygoogle'); for (let ad of ads) { ad.remove(); }"
+        );
+        getDriver().findElement(By.xpath("//input[@data-qa='login-email']")).sendKeys(email);
+        getDriver().findElement(By.xpath("//input[@data-qa='login-password']")).sendKeys(password);
+        jsClick(getDriver().findElement(By.xpath("//button[@data-qa='login-button']")));
     }
 }
