@@ -1,29 +1,49 @@
 package UI_tests;
 
-import base.BaseTest; // This fixes "Cannot resolve symbol BaseTest"
+import base.BaseTest;
 import io.qameta.allure.Allure;
 import org.openqa.selenium.By;
+import org.openqa.selenium.JavascriptExecutor;
+import org.openqa.selenium.WebElement;
+import org.openqa.selenium.support.ui.ExpectedConditions;
+import org.openqa.selenium.support.ui.WebDriverWait;
 import org.testng.Assert;
 import org.testng.annotations.Test;
+import java.time.Duration;
 
 public class SearchAndSubscriptionTests extends BaseTest {
 
-    @Test(description = "Test Case 9: Search Product")
+    private void safeClick(By locator) {
+        WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(15));
+        WebElement element = wait.until(ExpectedConditions.presenceOfElementLocated(locator));
+        ((JavascriptExecutor) getDriver()).executeScript("const ads = document.getElementsByClassName('adsbygoogle'); for (let ad of ads) { ad.remove(); }");
+        ((JavascriptExecutor) getDriver()).executeScript("arguments[0].click();", element);
+    }
+
+    @Test(description = "4. Search Product TC9")
     public void testSearchProduct_TC9() {
-        // We use 'driver' directly because it is 'protected' in BaseTest
+        getDriver().get("https://automationexercise.com/products");
+        getDriver().findElement(By.id("search_product")).sendKeys("Blue Top");
+        safeClick(By.id("submit_search"));
+        WebElement header = new WebDriverWait(getDriver(), Duration.ofSeconds(10))
+                .until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//h2[text()='Searched Products']")));
+        Assert.assertTrue(header.isDisplayed());
+    }
 
-        Allure.step("Click on 'Products' button", () -> {
-            driver.findElement(By.xpath("//a[@href='/products']")).click();
-        });
+    @Test(description = "5. Verify Subscription in Home Page")
+    public void testSubscriptionHome() {
+        getDriver().get("https://automationexercise.com");
+        ((JavascriptExecutor) getDriver()).executeScript("window.scrollTo(0, document.body.scrollHeight)");
+        getDriver().findElement(By.id("susbscribe_email")).sendKeys("test@test.com");
+        safeClick(By.id("subscribe"));
+        Assert.assertTrue(getDriver().findElement(By.id("success-subscribe")).isDisplayed());
+    }
 
-        Allure.step("Enter product name 'Blue Top' and search", () -> {
-            driver.findElement(By.id("search_product")).sendKeys("Blue Top");
-            driver.findElement(By.id("submit_search")).click();
-        });
-
-        Allure.step("Verify 'SEARCHED PRODUCTS' is visible", () -> {
-            boolean isVisible = driver.findElement(By.xpath("//h2[text()='Searched Products']")).isDisplayed();
-            Assert.assertTrue(isVisible);
-        });
+    @Test(description = "6. Verify Subscription in Cart Page")
+    public void testSubscriptionCart() {
+        getDriver().get("https://automationexercise.com/view_cart");
+        getDriver().findElement(By.id("susbscribe_email")).sendKeys("test@test.com");
+        safeClick(By.id("subscribe"));
+        Assert.assertTrue(getDriver().findElement(By.id("success-subscribe")).isDisplayed());
     }
 }

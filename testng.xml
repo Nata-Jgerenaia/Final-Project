@@ -1,11 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE suite SYSTEM "https://testng.org/testng-1.0.dtd">
-<suite name="Final Project Suite">
-    <test thread-count="5" name="API and UI Tests">
+<suite name="Final Project Suite" parallel="methods" thread-count="6">
+    <test name="Total 20 Cases">
         <classes>
-            <class name="API_tests.ProductApiTests"/>
+            <class name="UI_tests.RegistrationLoginTests"/>
+            <class name="UI_tests.SearchAndSubscriptionTests"/>
             <class name="UI_tests.UserWorkFlowTests"/>
+            <class name="API_tests.ProductApiTests"/>
             <class name="API_tests.APItest"/>
+            <class name="API_tests.UserApiTests"/>
         </classes>
     </test>
 </suite>
