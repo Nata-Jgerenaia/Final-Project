@@ -31,15 +31,14 @@ public class ProductApiTests {
 
     @Test(priority = 3, description = "API 9: DELETE To Verify Login")
     public void testDeleteVerifyLogin() {
-        // We use .delete() instead of .post()
+
         Response response = RestAssured.given()
                 .delete(BASE_URL + "/verifyLogin");
 
-        // Print the response so you can see the message
         System.out.println("API 9 Response: " + response.getBody().asString());
 
         Assert.assertEquals(response.getStatusCode(), 200);
-        // The API should tell you that DELETE is not supported for this URL
+
         Assert.assertTrue(response.getBody().asString().contains("This request method is not supported."),
                 "Response message should indicate method not supported");
 
