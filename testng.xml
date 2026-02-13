@@ -6,6 +6,9 @@
             <class name="API_tests.ProductApiTests"/>
             <class name="UI_tests.UserWorkFlowTests"/>
             <class name="API_tests.APItest"/>
+
+            <class name="UI_tests.SearchAndSubscriptionTests"/>
+            <class name="API_tests.UserApiTests"/>
         </classes>
     </test>
 </suite>
