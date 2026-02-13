@@ -38,6 +38,7 @@ public class APItest {
         Response response = get("/brandsList");
         Assert.assertEquals(response.getStatusCode(), 200);
         Assert.assertTrue(response.getBody().asString().contains("brands"), "Body should contain brands");
+
     }
 
     @Test

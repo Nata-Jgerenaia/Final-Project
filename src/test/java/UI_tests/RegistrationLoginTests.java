@@ -17,7 +17,7 @@ public class RegistrationLoginTests extends BaseTest {
     public void testFullUserLifecycle() {
         WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
         JavascriptExecutor js = (JavascriptExecutor) driver;
-        String email = "nata_flow_" + System.currentTimeMillis() + "@mail.com";
+        String email = "nata." + System.currentTimeMillis() + "@mail.com";
         String password = "Pass123!";
 
         // --- STEP 1: REGISTER ---
