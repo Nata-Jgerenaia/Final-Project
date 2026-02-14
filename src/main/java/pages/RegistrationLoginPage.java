@@ -18,12 +18,10 @@ public class RegistrationLoginPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(20));
     }
 
-    // Navigate to login page
     public void goToLoginPage() {
         driver.get("https://automationexercise.com/login");
     }
 
-    // Fill registration fields
     public void register(String name, String email, String password) {
         driver.get("https://automationexercise.com/login");
 
@@ -36,14 +34,11 @@ public class RegistrationLoginPage {
         WebElement signupBtn = driver.findElement(By.xpath("//button[@data-qa='signup-button']"));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", signupBtn);
 
-        // Here you can continue filling password, etc., if needed
     }
 
-    // Login method
     public void login(String email, String password) {
-        goToLoginPage(); // ensure we are on login page
+        goToLoginPage();
 
-        // Wait for email input to be visible
         WebElement emailInput = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//input[@data-qa='login-email']")));
         emailInput.sendKeys(email);
 
@@ -54,13 +49,11 @@ public class RegistrationLoginPage {
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", loginBtn);
     }
 
-    // Logout method
     public void logout() {
         WebElement logoutBtn = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//a[@data-qa='logout-button']")));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", logoutBtn);
     }
 
-    // Verify login success
     public boolean isLoggedIn(String username) {
         WebElement loggedInAs = wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath("//*[contains(text(), 'Logged in as')]")));
         return loggedInAs.getText().contains(username);

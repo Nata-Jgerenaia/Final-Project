@@ -43,17 +43,13 @@ public class SearchAndSubscriptionTests extends BaseTest {
     public void testSubscriptionCart() {
         getDriver().get("https://automationexercise.com/view_cart");
 
-        // 1. Enter email
         getDriver().findElement(By.id("susbscribe_email")).sendKeys("test@test.com");
 
-        // 2. Click subscribe
         safeClick(By.id("subscribe"));
 
-        // 3. WAIT for the message to be visible before asserting
         WebDriverWait wait = new WebDriverWait(getDriver(), Duration.ofSeconds(10));
         WebElement successMessage = wait.until(ExpectedConditions.visibilityOfElementLocated(By.id("success-subscribe")));
 
-        // 4. Now assert
         Assert.assertTrue(successMessage.isDisplayed(), "Subscription success message was not displayed!");
     }
 }

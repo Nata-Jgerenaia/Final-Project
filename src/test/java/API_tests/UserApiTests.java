@@ -19,7 +19,7 @@ public class UserApiTests {
     @Test(description = "API 12: DELETE User Account")
     public void testDeleteAccount_API12() {
         Response response = given()
-                .filter(new AllureRestAssured()) // This adds the Request/Response to Allure
+                .filter(new AllureRestAssured())
                 .formParam("email", "testuser_gemini@example.com")
                 .formParam("password", "password123")
                 .delete("/deleteAccount");
@@ -30,7 +30,7 @@ public class UserApiTests {
     @Test(description = "API 13: PUT Update User Account")
     public void testUpdateAccount_API13() {
         Response response = given()
-                .filter(new AllureRestAssured()) // Requirement fulfilled here too
+                .filter(new AllureRestAssured())
                 .formParam("name", "Updated Name")
                 .formParam("email", "testuser_gemini@example.com")
                 .formParam("password", "password123")

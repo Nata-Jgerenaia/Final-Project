@@ -16,7 +16,6 @@ public class ProductPage {
         this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
     }
 
-    // Locators
     private By productsLink = By.xpath("//a[@href='/products']");
     private By cartLink = By.xpath("//a[@href='/view_cart']");
     private By allProductsHeader = By.xpath("//h2[text()='All Products']");
@@ -29,7 +28,6 @@ public class ProductPage {
     private By subscribeArrowButton = By.id("subscribe");
     private By successMessage = By.id("success-subscribe");
 
-    // Methods
     public void navigateToAllProducts() {
         WebElement link = wait.until(d -> d.findElement(productsLink));
         ((JavascriptExecutor) driver).executeScript("arguments[0].click();", link);
@@ -45,12 +43,10 @@ public class ProductPage {
     }
 
     public boolean isSearchedProductsVisible() {
-        // Fix: Use Lambda to find the element and then check if it's displayed
         return wait.until(d -> d.findElement(searchedProductsHeader)).isDisplayed();
     }
 
     public void subscribe(String email) {
-        // Fix: Explicitly find the element within the wait
         WebElement emailField = wait.until(d -> d.findElement(subscriptionEmailField));
         ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView(true);", emailField);
         emailField.sendKeys(email);
@@ -62,7 +58,6 @@ public class ProductPage {
     }
 
     public boolean isAllProductsVisible() {
-        // Fix: Use Lambda instead of ExpectedConditions
         return wait.until(d -> d.findElement(allProductsHeader)).isDisplayed();
     }
 
